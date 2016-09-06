@@ -4,7 +4,7 @@ from scapy.all import sniff, ARP
 from signal import signal, SIGINT
 import sys
 
-arp_watcher_db_file = "/var/Cache/arp-watcher.db"
+arp_watcher_db_file = "/var/cache/arp-watcher.db"
 ip_mac = {}
 
 #Save ARP table on shutdown
@@ -20,13 +20,13 @@ def sig_int_handler(signum, frame):
       f.close()
       print "Done."
 
-    except IOError:
+   except IOError:
       print "Cannot write file " + arp_watcher_db_file
       sys.exit(1)
 
 
 
-def watch_arp(pkt)):
+def watch_arp(pkt):
    #got is-at pkt (ARP response)
    if pkt[ARP].op == 2:
       print pkt[ARP].hwsrc + " " + pkt[ARP].psrc
