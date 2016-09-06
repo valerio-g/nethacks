@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from scapy.all import sniff, ARP
-from signal import signal, SIGINT
+import signal 
 import sys
 
 arp_watcher_db_file = "/var/cache/arp-watcher.db"
@@ -19,6 +19,7 @@ def sig_int_handler(signum, frame):
    
       f.close()
       print "Done."
+      sys.exit(0)
 
    except IOError:
       print "Cannot write file " + arp_watcher_db_file
@@ -34,7 +35,7 @@ def watch_arp(pkt):
       #Device is new. Remember it.
       if ip_mac.get(pkt[ARP].psrc) == None :
          print "Found new device " + pkt[ARP].hwsrc + " " + pkt[ARP].psrc
-         ip_mac[pkt[ARP].psrc] = pkt[ARP].psrc
+         ip_mac[pkt[ARP].psrc] = pkt[ARP].hwsrc
 
       #Device is known but has a different IP
       elif ip_mac.get(pkt[ARP].psrc) and ip_mac[pkt[ARP].psrc] != pkt[ARP].hwsrc:
@@ -43,7 +44,7 @@ def watch_arp(pkt):
          ip_mac[pkt[ARP].psrc] = pkt[ARP].hwsrc
 
 
-signal(SIGINT, sig_int_handler)
+signal.signal(signal.SIGINT, sig_int_handler)
 
 if len(sys.argv) < 2:
    print sys.argv[0] + " iface"
@@ -56,12 +57,12 @@ except IOError:
    sys.exit(1)
 
 for line in fh:
-   line.chomp()
+   line.strip()
    (ip,mac) = line.split(" ")
    ip_mac[ip] = mac
 
 
-sniff(prn=watch_arp, filter = arp, iface=sys.argv[1], store=0)
+sniff(prn=watch_arp, filter="arp", iface=sys.argv[1], store=0)
 
        
    
