@@ -1,0 +1,16 @@
+#!/usr/bin/python
+
+import sys
+from scapy.all import sniff, sendp, ARP, Ether
+
+def print_packet(packet):
+   print str(packet)
+
+sniff(prn=print_packet, \
+      filter="icmp", \
+      iface=sys.argv[1],\
+      store=0)
+
+
+    
+
